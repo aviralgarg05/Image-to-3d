@@ -3,9 +3,9 @@ Flask==2.2.5  # Web framework for API
 gunicorn==21.2.0  # Production WSGI server for Railway
 
 # Machine Learning & Torch
-torch==2.1.0  # Ensure compatibility with torchmcubes
-torchvision==0.16.0
-torchaudio==2.1.0
+torch 
+torchvision 
+torchaudio --index-url https://download.pytorch.org/whl/cpu
 einops==0.7.0
 transformers==4.35.0
 huggingface-hub==0.20.0
