@@ -9,25 +9,25 @@ ENV TZ=Etc/UTC
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies (CMake, GCC, OpenMP, Python, and required tools)
+# Install system dependencies, including Python 3.9
 RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     cmake ninja-build libomp-dev \
     build-essential git wget curl unzip \
     gawk bison flex autoconf automake \
-    tzdata libcrypt-dev python3-pip python3.9 python3.9-venv python3.9-dev && \
+    tzdata libcrypt-dev python3.9 python3.9-venv python3.9-dev python3-pip && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
+# Ensure Python 3.9 is the default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
 # Upgrade PIP and install essential build tools
-RUN python3.9 -m ensurepip && \
-    python3.9 -m pip install --no-cache-dir --upgrade pip setuptools wheel cmake ninja scikit-build
+RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel cmake ninja scikit-build
 
-# Create a virtual environment
-RUN python3.9 -m venv /app/venv
-
-# Activate the virtual environment
+# Create and activate a virtual environment
+RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
 # Install CPU-only versions of torch, torchvision, and torchaudio
