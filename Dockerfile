@@ -11,36 +11,34 @@ WORKDIR /app
 
 # Install system dependencies (CMake, GCC, OpenMP, Python, and missing tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-venv \
+    software-properties-common \
     cmake ninja-build libomp-dev \
     build-essential git wget curl unzip \
     gawk bison flex autoconf automake \
-    tzdata libcrypt-dev software-properties-common && \
+    tzdata libcrypt-dev && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Download and install GLIBC 2.31 from a prebuilt package
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+# ✅ Upgrade Python to 3.9+ (Required for torchmcubes)
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
     apt-get update && \
-    apt-get install -y libc6
+    apt-get install -y python3.9 python3.9-venv python3.9-dev && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
-# ✅ Verify GLIBC installation
-RUN ldd --version
+# ✅ Verify Python version
+RUN python3 --version
 
 # Copy project files
 COPY . /app
 
-# ✅ Ensure Python works correctly before creating a virtual environment
-RUN python3 --version
-
-# ✅ Create a virtual environment and install Python dependencies
+# ✅ Use Python 3.9 to create a virtual environment
 RUN python3 -m venv venv
 RUN . venv/bin/activate && pip install --upgrade pip
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-# ✅ Manually install torchmcubes (since it fails in requirements.txt)
-RUN . venv/bin/activate && pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
+# ✅ Manually install torchmcubes (Ensuring Python 3.9 is used)
+RUN venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose port for Flask
 EXPOSE 5000
