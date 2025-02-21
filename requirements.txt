@@ -3,10 +3,10 @@ Flask==2.2.5
 gunicorn==21.2.0
 
 # Machine Learning & Transformers
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
-torchaudio==2.1.0+cpu
--f https://download.pytorch.org/whl/torch
+torch==2.1.0
+torchvision==0.16.0
+torchaudio==2.1.0
+-f https://download.pytorch.org/whl/cpu
 einops==0.7.0
 transformers==4.35.0
 huggingface-hub>=0.16.4,<0.18  # Fixes dependency conflicts
