@@ -6,9 +6,16 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install system dependencies (CMake, GCC, OpenMP, GLIBC)
-RUN apt-get update && apt-get install -y \
-    python3 python3-pip python3-venv \
-    cmake ninja-build libomp-dev \
+# Set timezone to UTC and prevent tzdata from prompting
+ENV DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake ninja-build libomp-dev tzdata && \
+    ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
     build-essential git wget curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
