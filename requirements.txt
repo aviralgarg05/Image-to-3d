@@ -3,12 +3,10 @@ Flask==2.2.5  # Web framework for API
 gunicorn==21.2.0  # Production WSGI server for Railway
 
 # Machine Learning & Torch
-torch 
-torchvision 
-torchaudio --index-url https://download.pytorch.org/whl/cpu
+torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 einops==0.7.0
 transformers==4.35.0
-huggingface-hub==0.20.0
+huggingface-hub>=0.16.4,<0.18  # Fixes dependency conflicts
 
 # 3D Processing & Rendering
 trimesh==4.0.5
@@ -19,16 +17,16 @@ imageio[ffmpeg]==2.33.1  # Video rendering support
 # Background Removal
 rembg==2.0.50  # Background removal model
 
-# Mesh Extraction
+# Mesh Extraction & CMake
 cmake==3.27.7
 ninja==1.11.1
-# Direct GitHub dependency
+pybind11==2.10.4  # Required for building xatlas & mesh extraction
 
 # Config Management
 omegaconf==2.3.0
 
 # UI for Local Testing
-gradio==3.50.0  # Optional for testing a frontend
+gradio==3.34.0  # Downgraded to avoid Hugging Face conflicts
 
 # Image Processing
 Pillow==10.1.0
