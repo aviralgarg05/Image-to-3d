@@ -38,7 +38,7 @@ RUN . venv/bin/activate && pip install --upgrade pip
 
 # Install the CPU-only versions of torch, torchvision, and torchaudio explicitly
 RUN . venv/bin/activate && \
-    pip install --no-cache-dir torch==2.1.0+cpu torchvision==0.16.0+cpu torchaudio==2.1.0+cpu -f https://download.pytorch.org/whl/cpu
+    pip install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -f https://download.pytorch.org/whl/cpu
 
 # Uninstall any CUDA-related packages that might have been installed (ignore errors)
 RUN . venv/bin/activate && pip uninstall -y \
@@ -54,7 +54,7 @@ RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 ENV FORCE_CUDA=0
 ENV TORCH_CUDA_ARCH_LIST=""
 
-# Install torchmcubes from GitHub (should now build for CPU only)
+# Install torchmcubes from GitHub (this should now build for CPU only)
 RUN . venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose the port for Flask (or your API)
