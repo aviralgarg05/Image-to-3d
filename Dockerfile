@@ -36,7 +36,7 @@ COPY . /app
 RUN python3.9 -m venv venv
 
 # Activate the virtual environment and upgrade essential build tools
-RUN venv/bin/pip install --upgrade pip setuptools wheel
+RUN venv/bin/pip install --upgrade pip setuptools wheel cmake ninja scikit-build
 
 # Install the CPU-only versions of torch, torchvision, and torchaudio
 RUN venv/bin/pip install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -f https://download.pytorch.org/whl/cpu
@@ -66,7 +66,9 @@ RUN git clone https://github.com/tatsy/torchmcubes.git && \
     sed -i 's/find_package(CUDA REQUIRED)//g' CMakeLists.txt && \
     sed -i 's/SET(USE_CUDA TRUE)/SET(USE_CUDA OFF)/g' CMakeLists.txt && \
     sed -i '/find_package(Torch REQUIRED)/a set(CAFFE2_DISABLE_CUDA ON)' CMakeLists.txt && \
-    ../venv/bin/pip install --no-cache-dir . && \
+    # Ensure clean build with explicit CPU flags
+    CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA=ON" \
+    venv/bin/python -m pip install --no-cache-dir . && \
     cd .. && rm -rf torchmcubes
 
 # Expose the API port
