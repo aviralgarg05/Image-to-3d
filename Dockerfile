@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Upgrade Python to 3.9+ (Required for torchmcubes)
+# ✅ Upgrade to Python 3.9 (Needed for torchmcubes)
 RUN add-apt-repository ppa:deadsnakes/ppa -y && \
     apt-get update && \
     apt-get install -y python3.9 python3.9-venv python3.9-dev && \
@@ -35,10 +35,15 @@ COPY . /app
 # ✅ Use Python 3.9 to create a virtual environment
 RUN python3 -m venv venv
 RUN . venv/bin/activate && pip install --upgrade pip
+
+# ✅ Install the CPU-Only Version of PyTorch to prevent CUDA issues
+RUN . venv/bin/activate && pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# ✅ Install dependencies from requirements.txt
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-# ✅ Manually install torchmcubes (Ensuring Python 3.9 is used)
-RUN venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
+# ✅ Manually install torchmcubes (Forces CPU compilation)
+RUN TORCH_CUDA_ARCH_LIST="0" venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose port for Flask
 EXPOSE 5000
