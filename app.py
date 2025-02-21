@@ -1,4 +1,11 @@
 import os
+
+# Install system-level dependencies before torchmcubes
+os.system("apt-get update && apt-get install -y cmake ninja-build libomp-dev")
+
+# Install torchmcubes manually
+os.system("pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git")
+
 import logging
 import time
 import torch
@@ -11,8 +18,7 @@ import tempfile
 from tsr.system import TSR
 from tsr.utils import remove_background, resize_foreground, save_video
 from tsr.bake_texture import bake_texture
-os.system("pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git")
-os.system("pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu")
+
 # Initialize Flask app
 app = Flask(__name__)
 

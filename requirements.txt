@@ -9,7 +9,7 @@ torchaudio==2.1.0
 -f https://download.pytorch.org/whl/cpu
 einops==0.7.0
 transformers==4.35.0
-huggingface-hub>=0.16.4,<0.18  # Fixes dependency conflicts
+huggingface-hub>=0.16.4,<0.18
 
 # 3D Processing & Rendering
 trimesh==4.0.5
@@ -20,7 +20,7 @@ imageio[ffmpeg]==2.33.1
 # Background Removal
 rembg==2.0.50
 
-# Mesh Extraction & CMake
+# Mesh Extraction & CMake (System Dependencies First)
 cmake==3.27.7
 ninja==1.11.1
 pybind11==2.10.4
@@ -29,10 +29,9 @@ pybind11==2.10.4
 omegaconf==2.3.0
 
 # UI for Local Testing
-gradio==3.34.0  # Fix Hugging Face conflicts
+gradio==3.34.0
 
 # Image Processing
 Pillow==10.1.0
 numpy==1.24.3
 scipy==1.10.0
-git+https://github.com/tatsy/torchmcubes.git
