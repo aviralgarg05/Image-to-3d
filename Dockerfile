@@ -1,7 +1,7 @@
 # Use an official Ubuntu base image
 FROM ubuntu:20.04
 
-# Set up environment variables to prevent tzdata interactive prompt
+# Set environment variables to prevent tzdata interactive prompt
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -20,17 +20,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Download and extract a precompiled GLIBC 2.31 package
-RUN wget -qO glibc-2.31.tar.gz http://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
+# ✅ Download a verified prebuilt GLIBC 2.31 package
+RUN wget -qO glibc-2.31.tar.gz https://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
     tar -xvzf glibc-2.31.tar.gz && \
+    mv glibc-2.31 /opt/glibc-2.31 && \
     rm glibc-2.31.tar.gz
 
-# ✅ Set up GLIBC and libcrypt correctly
-ENV LD_LIBRARY_PATH=/app/glibc-2.31/lib:$LD_LIBRARY_PATH
-RUN ln -s /app/glibc-2.31/lib/libcrypt.so.1 /lib64/libcrypt.so.1
+# ✅ Configure GLIBC environment variables
+ENV LD_LIBRARY_PATH=/opt/glibc-2.31/lib:$LD_LIBRARY_PATH
+RUN ln -s /opt/glibc-2.31/lib/ld-2.31.so /lib64/ld-linux-x86-64.so.2
 
-# ✅ Verify GLIBC installation
-RUN /app/glibc-2.31/lib/ld-2.31.so --version
+# ✅ Verify GLIBC installation (Fixes previous error)
+RUN /lib64/ld-linux-x86-64.so.2 --version
 
 # Copy project files
 COPY . /app
