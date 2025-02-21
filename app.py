@@ -11,11 +11,11 @@ import tempfile
 from tsr.system import TSR
 from tsr.utils import remove_background, resize_foreground, save_video
 from tsr.bake_texture import bake_texture
-
+os.system("pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git")
+os.system("pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu")
 # Initialize Flask app
 app = Flask(__name__)
-os.system("pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu")
-os.system("pip install git+https://github.com/tatsy/torchmcubes.git")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
