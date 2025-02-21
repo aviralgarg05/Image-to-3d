@@ -32,9 +32,10 @@ RUN python3 --version
 # Copy project files into the container
 COPY . /app
 
-# Create a virtual environment using Python 3.9 and upgrade pip
-RUN python3 -m venv venv
-RUN . venv/bin/activate && pip install --upgrade pip
+# Create a virtual environment using Python 3.9 and upgrade pip in one step
+RUN python3 -m venv venv && \
+    venv/bin/python --version && \
+    . venv/bin/activate && pip install --upgrade pip
 
 # Install the CPU-only versions of torch, torchvision, and torchaudio explicitly
 RUN . venv/bin/activate && \
