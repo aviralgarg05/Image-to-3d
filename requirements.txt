@@ -1,8 +1,12 @@
 # Core Dependencies
-Flask==2.2.5  # Web framework for API
-gunicorn==21.2.0  # Production WSGI server for Railway
+Flask==2.2.5
+gunicorn==21.2.0
 
 # Machine Learning & Transformers
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+torchaudio==2.1.0+cpu
+-f https://download.pytorch.org/whl/torch
 einops==0.7.0
 transformers==4.35.0
 huggingface-hub>=0.16.4,<0.18  # Fixes dependency conflicts
@@ -11,21 +15,21 @@ huggingface-hub>=0.16.4,<0.18  # Fixes dependency conflicts
 trimesh==4.0.5
 moderngl==5.10.0
 xatlas==0.0.9
-imageio[ffmpeg]==2.33.1  # Video rendering support
+imageio[ffmpeg]==2.33.1
 
 # Background Removal
-rembg==2.0.50  # Background removal model
+rembg==2.0.50
 
 # Mesh Extraction & CMake
 cmake==3.27.7
 ninja==1.11.1
-pybind11==2.10.4  # Required for building xatlas & mesh extraction
+pybind11==2.10.4
 
 # Config Management
 omegaconf==2.3.0
 
 # UI for Local Testing
-gradio==3.34.0  # Downgraded to avoid Hugging Face conflicts
+gradio==3.34.0  # Fix Hugging Face conflicts
 
 # Image Processing
 Pillow==10.1.0
