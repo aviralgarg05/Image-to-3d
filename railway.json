@@ -1,9 +1,8 @@
 {
-    "build": {
-      "install": [
-        "apt-get update",
-        "apt-get install -y cmake libomp-dev"
-      ]
-    }
+  "build": {
+    "install": [
+      "apt-get update",
+      "apt-get install -y cmake ninja-build libomp-dev"
+    ]
   }
-  
+}
