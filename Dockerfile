@@ -8,11 +8,12 @@ ENV DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies (CMake, GCC, OpenMP, GLIBC, Python)
+# Install system dependencies (CMake, GCC, OpenMP, GLIBC, Python, and missing tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv \
     cmake ninja-build libomp-dev \
-    build-essential git wget curl unzip tzdata && \
+    build-essential git wget curl unzip tzdata \
+    gawk bison flex autoconf automake && \  # 🔹 NEW: Install required tools
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
