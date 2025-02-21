@@ -20,7 +20,10 @@ imageio[ffmpeg]==2.33.1  # Video rendering support
 rembg==2.0.50  # Background removal model
 
 # Mesh Extraction
-git+https://github.com/tatsy/torchmcubes.git  # Direct GitHub dependency
+torchmcubes==0.1.2  # Use an older, stable release
+cmake==3.27.7
+ninja==1.11.1
+# Direct GitHub dependency
 
 # Config Management
 omegaconf==2.3.0
