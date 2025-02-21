@@ -1,7 +1,7 @@
-# Use an Ubuntu base image
+# Use an official Ubuntu base image
 FROM ubuntu:20.04
 
-# Set up environment variables
+# Set environment variables to prevent tzdata interactive prompt
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -20,18 +20,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# 🔹 Instead of compiling GLIBC, download a prebuilt version
-RUN wget -qO /lib/x86_64-linux-gnu/libm.so.6 http://ftp.gnu.org/gnu/libc/glibc-2.36.tar.gz
+# ✅ Download & install a trusted prebuilt GLIBC version (Fixes libm.so.6 issue)
+RUN wget http://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
+    tar -xvzf glibc-2.31.tar.gz && \
+    cd glibc-2.31 && mkdir build && cd build && \
+    ../configure --prefix=/usr && make -j$(nproc) && make install && \
+    cd /app && rm -rf glibc-2.31*
 
 # Copy project files
 COPY . /app
 
-# Create a virtual environment and install Python dependencies
+# ✅ Ensure Python works correctly by checking the version
+RUN python3 --version
+
+# ✅ Create a virtual environment and install Python dependencies
 RUN python3 -m venv venv
 RUN . venv/bin/activate && pip install --upgrade pip
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-# Manually install torchmcubes (since it's failing in requirements.txt)
+# ✅ Manually install torchmcubes (since it fails in requirements.txt)
 RUN . venv/bin/activate && pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose port for Flask
