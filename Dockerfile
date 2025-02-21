@@ -28,7 +28,9 @@ RUN wget -qO glibc-2.31.tar.gz https://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz &&
 
 # ✅ Configure GLIBC environment variables
 ENV LD_LIBRARY_PATH=/opt/glibc-2.31/lib:$LD_LIBRARY_PATH
-RUN ln -s /opt/glibc-2.31/lib/ld-2.31.so /lib64/ld-linux-x86-64.so.2
+
+# ✅ Check if the symbolic link exists before creating it
+RUN [ -f /lib64/ld-linux-x86-64.so.2 ] && rm -f /lib64/ld-linux-x86-64.so.2; ln -s /opt/glibc-2.31/lib/ld-2.31.so /lib64/ld-linux-x86-64.so.2
 
 # ✅ Verify GLIBC installation (Fixes previous error)
 RUN /lib64/ld-linux-x86-64.so.2 --version
