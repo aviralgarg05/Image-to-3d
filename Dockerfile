@@ -1,7 +1,7 @@
 # Use an official Ubuntu base image
 FROM ubuntu:20.04
 
-# Set environment variables to prevent tzdata interactive prompt
+# Set up environment variables to prevent tzdata interactive prompt
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -15,22 +15,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake ninja-build libomp-dev \
     build-essential git wget curl unzip \
     gawk bison flex autoconf automake \
-    tzdata && \
+    tzdata libcrypt-dev && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Download & install a trusted prebuilt GLIBC version (Fixes libm.so.6 issue)
-RUN wget http://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
+# ✅ Download and extract a precompiled GLIBC 2.31 package
+RUN wget -qO glibc-2.31.tar.gz http://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
     tar -xvzf glibc-2.31.tar.gz && \
-    cd glibc-2.31 && mkdir build && cd build && \
-    ../configure --prefix=/usr && make -j$(nproc) && make install && \
-    cd /app && rm -rf glibc-2.31*
+    rm glibc-2.31.tar.gz
+
+# ✅ Set up GLIBC and libcrypt correctly
+ENV LD_LIBRARY_PATH=/app/glibc-2.31/lib:$LD_LIBRARY_PATH
+RUN ln -s /app/glibc-2.31/lib/libcrypt.so.1 /lib64/libcrypt.so.1
+
+# ✅ Verify GLIBC installation
+RUN /app/glibc-2.31/lib/ld-2.31.so --version
 
 # Copy project files
 COPY . /app
 
-# ✅ Ensure Python works correctly by checking the version
+# ✅ Ensure Python works correctly before creating a virtual environment
 RUN python3 --version
 
 # ✅ Create a virtual environment and install Python dependencies
