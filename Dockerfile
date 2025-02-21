@@ -63,11 +63,16 @@ ENV CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA
 # Clone and manually patch torchmcubes to disable CUDA
 RUN git clone https://github.com/tatsy/torchmcubes.git && \
     cd torchmcubes && \
+    # Debug: Check if setup.py exists
+    ls -l && \
     # Remove CUDA requirement and force USE_CUDA OFF in CMakeLists.txt
     sed -i 's/find_package(CUDA REQUIRED)//g' CMakeLists.txt && \
     sed -i 's/SET(USE_CUDA TRUE)/SET(USE_CUDA OFF)/g' CMakeLists.txt && \
     sed -i '/find_package(Torch REQUIRED)/a set(CAFFE2_DISABLE_CUDA ON)' CMakeLists.txt && \
-    sed -i 's/cmake_args=\[\]/cmake_args=["-DUSE_CUDA=OFF", "-DCAFFE2_DISABLE_CUDA=ON"]/' setup.py && \
+    # Check if setup.py exists before modifying
+    if [ -f "setup.py" ]; then \
+        sed -i 's/cmake_args=\[\]/cmake_args=["-DUSE_CUDA=OFF", "-DCAFFE2_DISABLE_CUDA=ON"]/' setup.py; \
+    fi && \
     /app/venv/bin/python -m pip install --no-cache-dir . && \
     cd .. && rm -rf torchmcubes
 
