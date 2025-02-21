@@ -40,10 +40,10 @@ RUN virtualenv -p python3.9 venv
 RUN venv/bin/pip install --upgrade pip
 
 # Install the CPU-only versions of torch, torchvision, and torchaudio explicitly.
-# Note: The CPU wheels are provided without the "+cpu" suffix.
+# (Note: the CPU wheels are provided without a "+cpu" suffix.)
 RUN venv/bin/pip install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -f https://download.pytorch.org/whl/cpu
 
-# Uninstall any CUDA-related packages (ignore errors)
+# Uninstall any CUDA-related packages that might have been installed (ignore errors)
 RUN venv/bin/pip uninstall -y \
     nvidia-cuda-runtime-cu12 nvidia-cuda-cupti-cu12 nvidia-cudnn-cu12 \
     nvidia-cublas-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 \
@@ -53,17 +53,17 @@ RUN venv/bin/pip uninstall -y \
 # Install remaining Python dependencies from requirements.txt
 RUN venv/bin/pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables to force CPU-only build for torchmcubes.
-# Also clear CUDA-related env variables.
+# Set environment variables to force a CPU-only build for torchmcubes
 ENV FORCE_CUDA=0
 ENV TORCH_CUDA_ARCH_LIST=""
 ENV CUDA_TOOLKIT_ROOT_DIR=""
 ENV CUDA_VISIBLE_DEVICES=""
+ENV CUDA_HOME=""
+ENV CUDA_PATH=""
 
-# Install torchmcubes from GitHub.
-# Extra CMake arguments force a CPU-only build by disabling CUDA and Caffe2 CUDA.
-RUN env CUDA_TOOLKIT_ROOT_DIR="" CUDA_VISIBLE_DEVICES="" \
-    CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA=ON" \
+# Install torchmcubes from GitHub with extra CMake flags to disable CUDA
+RUN env CUDA_TOOLKIT_ROOT_DIR="" CUDA_VISIBLE_DEVICES="" CUDA_HOME="" CUDA_PATH="" \
+    CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA=ON -DCUDA_NVCC_EXECUTABLE=" \
     venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose the port for your API
