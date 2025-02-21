@@ -14,6 +14,7 @@ from tsr.bake_texture import bake_texture
 
 # Initialize Flask app
 app = Flask(__name__)
+os.system("pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu")
 os.system("pip install git+https://github.com/tatsy/torchmcubes.git")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
