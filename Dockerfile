@@ -3,23 +3,21 @@ FROM ubuntu:20.04
 
 # Set up environment variables
 ENV PYTHONUNBUFFERED=1
-WORKDIR /app
-
-# Install system dependencies (CMake, GCC, OpenMP, GLIBC)
-# Set timezone to UTC and prevent tzdata from prompting
 ENV DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 
-# Install system dependencies
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (CMake, GCC, OpenMP, GLIBC, Python)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cmake ninja-build libomp-dev tzdata && \
+    python3 python3-pip python3-venv \
+    cmake ninja-build libomp-dev \
+    build-essential git wget curl unzip tzdata && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-    build-essential git wget curl unzip && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install the correct GLIBC version
+# Install the correct GLIBC version (Required for some dependencies)
 RUN wget http://ftp.gnu.org/gnu/libc/glibc-2.36.tar.gz && \
     tar -xvzf glibc-2.36.tar.gz && \
     cd glibc-2.36 && \
@@ -31,7 +29,7 @@ RUN wget http://ftp.gnu.org/gnu/libc/glibc-2.36.tar.gz && \
 # Copy project files
 COPY . /app
 
-# Install Python dependencies
+# Create virtual environment and install Python dependencies
 RUN python3 -m venv venv
 RUN . venv/bin/activate && pip install --upgrade pip
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
@@ -42,5 +40,5 @@ RUN . venv/bin/activate && pip install --no-cache-dir git+https://github.com/tat
 # Expose port for Flask
 EXPOSE 5000
 
-# Start the application
-CMD ["venv/bin/python", "app.py"]
+# Start the application with Gunicorn for production
+CMD ["venv/bin/gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
