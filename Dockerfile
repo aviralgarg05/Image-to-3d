@@ -32,17 +32,15 @@ RUN python3 --version
 # Copy project files into the container
 COPY . /app
 
-# Install virtualenv using the system pip (make sure pip is installed)
-RUN apt-get install -y python3-pip && \
-    pip3 install virtualenv
-
-# Create a virtual environment using virtualenv with Python 3.9
+# Install virtualenv via system pip and create a virtual environment using Python 3.9
+RUN apt-get install -y python3-pip && pip3 install virtualenv
 RUN virtualenv -p python3.9 venv
 
 # Upgrade pip inside the virtual environment
 RUN venv/bin/pip install --upgrade pip
 
-# Install the CPU-only versions of torch, torchvision, and torchaudio
+# Install the CPU-only versions of torch, torchvision, and torchaudio explicitly.
+# Note: Do not use the "+cpu" suffix here since the CPU wheels are provided without it.
 RUN venv/bin/pip install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -f https://download.pytorch.org/whl/cpu
 
 # Uninstall any CUDA-related packages that might have been installed (ignore errors)
@@ -58,9 +56,12 @@ RUN venv/bin/pip install --no-cache-dir -r requirements.txt
 # Set environment variables to force CPU-only build for torchmcubes
 ENV FORCE_CUDA=0
 ENV TORCH_CUDA_ARCH_LIST=""
+# Also clear CUDA_TOOLKIT_ROOT_DIR so CMake does not find any CUDA libraries.
+ENV CUDA_TOOLKIT_ROOT_DIR=""
 
-# Install torchmcubes from GitHub (should now build for CPU only)
-RUN venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
+# Install torchmcubes from GitHub with additional CMake argument to disable CUDA.
+RUN env CUDA_TOOLKIT_ROOT_DIR="" CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF" \
+    venv/bin/python -m pip install --no-cache-dir git+https://github.com/tatsy/torchmcubes.git
 
 # Expose the port for your API
 EXPOSE 5000
