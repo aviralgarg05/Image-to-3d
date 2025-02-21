@@ -30,6 +30,9 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel cmake n
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
+# Ensure wheel is installed to avoid `bdist_wheel` errors
+RUN pip install --no-cache-dir wheel
+
 # Install CPU-only versions of torch, torchvision, and torchaudio
 RUN pip install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 -f https://download.pytorch.org/whl/cpu
 
@@ -39,6 +42,9 @@ RUN pip uninstall -y \
     nvidia-cublas-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 \
     nvidia-cusolver-cu12 nvidia-cusparse-cu12 nvidia-nccl-cu12 nvidia-nvtx-cu12 \
     nvidia-nvjitlink-cu12 || true
+
+# Install `antlr4-python3-runtime` separately to prevent build failures
+RUN pip install --no-cache-dir antlr4-python3-runtime
 
 # Install all dependencies from requirements.txt
 COPY requirements.txt /app/
@@ -62,6 +68,8 @@ RUN git clone https://github.com/tatsy/torchmcubes.git && \
     sed -i 's/find_package(CUDA REQUIRED)//g' CMakeLists.txt && \
     sed -i 's/SET(USE_CUDA TRUE)/SET(USE_CUDA OFF)/g' CMakeLists.txt && \
     sed -i '/find_package(Torch REQUIRED)/a set(CAFFE2_DISABLE_CUDA ON)' CMakeLists.txt && \
+    # Ensure wheel is installed before building
+    pip install --no-cache-dir wheel && \
     # Explicitly pass CPU-only flags to setup.py
     pip install --no-cache-dir . --global-option="-DUSE_CUDA=OFF" --global-option="-DCAFFE2_DISABLE_CUDA=ON" && \
     cd .. && rm -rf torchmcubes
