@@ -20,9 +20,7 @@ imageio[ffmpeg]==2.33.1
 # Background Removal
 rembg==2.0.50
 
-# Mesh Extraction & CMake (System Dependencies First)
-cmake==3.27.7
-ninja==1.11.1
+# Mesh Extraction & CMake (Handled in Dockerfile)
 pybind11==2.10.4
 
 # Config Management
