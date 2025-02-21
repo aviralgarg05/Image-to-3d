@@ -58,12 +58,12 @@ ENV CUDA_TOOLKIT_ROOT_DIR=""
 ENV CUDA_VISIBLE_DEVICES=""
 ENV CUDA_HOME=""
 ENV CUDA_PATH=""
-ENV CMAKE_ARGS="-DOpenMP_CXX_FLAGS=-fopenmp -DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA=ON"
+ENV CMAKE_ARGS="-DUSE_CUDA=OFF -DCAFFE2_DISABLE_CUDA=ON"
 
 # Clone and manually patch torchmcubes to disable CUDA
 RUN git clone https://github.com/tatsy/torchmcubes.git && \
     cd torchmcubes && \
-    # Debug: Check if setup.py exists
+    echo "Checking torchmcubes directory contents:" && \
     ls -l && \
     # Remove CUDA requirement and force USE_CUDA OFF in CMakeLists.txt
     sed -i 's/find_package(CUDA REQUIRED)//g' CMakeLists.txt && \
