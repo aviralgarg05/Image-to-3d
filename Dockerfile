@@ -15,25 +15,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake ninja-build libomp-dev \
     build-essential git wget curl unzip \
     gawk bison flex autoconf automake \
-    tzdata libcrypt-dev && \
+    tzdata libcrypt-dev software-properties-common && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Download a verified prebuilt GLIBC 2.31 package
-RUN wget -qO glibc-2.31.tar.gz https://ftp.gnu.org/gnu/libc/glibc-2.31.tar.gz && \
-    tar -xvzf glibc-2.31.tar.gz && \
-    mv glibc-2.31 /opt/glibc-2.31 && \
-    rm glibc-2.31.tar.gz
+# ✅ Download and install GLIBC 2.31 from a prebuilt package
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+    apt-get update && \
+    apt-get install -y libc6
 
-# ✅ Configure GLIBC environment variables
-ENV LD_LIBRARY_PATH=/opt/glibc-2.31/lib:$LD_LIBRARY_PATH
-
-# ✅ Check if the symbolic link exists before creating it
-RUN [ -f /lib64/ld-linux-x86-64.so.2 ] && rm -f /lib64/ld-linux-x86-64.so.2; ln -s /opt/glibc-2.31/lib/ld-2.31.so /lib64/ld-linux-x86-64.so.2
-
-# ✅ Verify GLIBC installation (Fixes previous error)
-RUN /lib64/ld-linux-x86-64.so.2 --version
+# ✅ Verify GLIBC installation
+RUN ldd --version
 
 # Copy project files
 COPY . /app
